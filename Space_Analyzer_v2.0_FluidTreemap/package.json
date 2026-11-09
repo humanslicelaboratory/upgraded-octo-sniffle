@@ -1,0 +1,46 @@
+{
+  "name": "space-analyzer",
+  "version": "2.0.0",
+  "private": true,
+  "description": "A cross-platform disk space analyzer inspired by SpaceSniffer",
+  "main": "desktop/main.cjs",
+  "scripts": {
+    "start": "concurrently -k \"vite --host 127.0.0.1\" \"wait-on http://127.0.0.1:5173 && electron .\"",
+    "web": "vite --host 0.0.0.0",
+    "build:web": "vite build",
+    "dist:win": "npm run build:web && electron-builder --win nsis",
+    "test:layout": "node tests/layout-smoke.mjs",
+    "test:scanner": "node tests/scanner-smoke.cjs",
+    "test": "npm run test:layout && npm run test:scanner",
+    "check": "node --check desktop/main.cjs && node --check desktop/preload.cjs && node --check tests/scanner-smoke.cjs"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8",
+    "vite": "^6.0.5",
+    "concurrently": "^9.1.2",
+    "wait-on": "^8.0.1"
+  },
+  "build": {
+    "appId": "com.humanslicelab.spaceanalyzer",
+    "productName": "Space Analyzer",
+    "asar": true,
+    "files": [
+      "dist/**/*",
+      "desktop/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "directories": {
+      "output": "release"
+    }
+  }
+}

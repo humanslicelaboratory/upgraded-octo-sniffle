@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#252D29">
+  <link rel="stylesheet" href="./src/style.css">
+  <title>Space Analyzer · 磁盘空间分析器</title>
+</head>
+<body>
+  <div id="app">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark"><span></span><span></span><span></span></div><div><b>SPACE ANALYZER</b><small>磁盘空间分析器</small></div></div>
+      <div class="side-label">工作空间</div>
+      <button class="nav active" data-view="overview"><i>◫</i> 总览</button>
+      <button class="nav" data-view="treemap"><i>▦</i> 空间地图</button>
+      <button class="nav" data-view="files"><i>≡</i> 文件列表</button>
+      <button class="nav" data-view="types"><i>◉</i> 类型分析</button>
+      <div class="side-bottom">
+        <div class="scan-card"><div class="scan-dot"></div><div><b id="scan-state">尚未扫描</b><small id="scan-path">选择一个位置开始</small></div></div>
+        <button class="settings-btn" id="theme-toggle">◐　切换外观</button>
+        <div class="version">SPACE ANALYZER <span>v2.0</span></div>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div><div class="eyebrow">STORAGE INTELLIGENCE</div><h1 id="page-title">磁盘总览</h1></div>
+        <div class="top-actions"><button class="btn ghost" id="export-btn">↓ 导出报告</button><button class="btn primary" id="choose-btn"><span>＋</span> 选择扫描位置</button></div>
+      </header>
+      <section class="content">
+        <div class="welcome" id="welcome">
+          <div class="welcome-copy"><div class="eyebrow light">UNDERSTAND YOUR STORAGE</div><h2>让每一 GB 的空间<br>都清晰可见。</h2><p>扫描磁盘与文件夹，直观发现空间占用，<br>快速定位值得清理的大文件。</p><button class="btn light-btn" id="welcome-choose">开始扫描 <span>→</span></button></div>
+          <div class="orbital"><div class="orbit o1"></div><div class="orbit o2"></div><div class="orb-core"><span>SA</span></div><div class="orb-dot d1"></div><div class="orb-dot d2"></div></div>
+        </div>
+        <div id="dashboard" class="hidden">
+          <div class="stat-grid">
+            <article class="stat-card dark-stat"><div class="stat-top"><span>扫描总容量</span><span class="stat-icon">◫</span></div><strong id="total-size">—</strong><small id="root-label">当前扫描位置</small><div class="stat-line"><span id="total-files">0 个文件</span><span id="total-dirs">0 个文件夹</span></div></article>
+            <article class="stat-card"><div class="stat-top"><span>最大文件</span><span class="stat-icon muted">↗</span></div><strong id="largest-file">—</strong><small id="largest-name">扫描后显示</small><div class="stat-foot">按文件体积排序</div></article>
+            <article class="stat-card"><div class="stat-top"><span>文件类型</span><span class="stat-icon muted">◉</span></div><strong id="type-count">—</strong><small>不同扩展名</small><div class="stat-foot">识别文件构成</div></article>
+            <article class="stat-card"><div class="stat-top"><span>扫描耗时</span><span class="stat-icon muted">◷</span></div><strong id="scan-time">—</strong><small>本次扫描</small><div class="stat-foot">实时统计</div></article>
+          </div>
+          <div class="section-heading"><div><div class="eyebrow">VISUAL BREAKDOWN</div><h2>空间分布</h2></div><button class="text-btn" data-goto="treemap">查看空间地图　→</button></div>
+          <div class="panel map-panel"><div class="panel-head"><div><b id="map-root-name">文件夹结构</b><small>区域面积代表文件或文件夹占用空间</small></div><div class="legend"><span><i class="lg-a"></i>文件夹</span><span><i class="lg-b"></i>文件</span></div></div><canvas id="mini-map" class="fluid-canvas mini" aria-label="流体式空间地图预览"></canvas></div>
+          <div class="bottom-grid">
+            <div class="panel"><div class="panel-head"><div><b>空间占用排行</b><small>占用空间最大的文件夹</small></div><button class="text-btn" data-goto="files">全部文件 →</button></div><div id="folder-ranking" class="ranking"></div></div>
+            <div class="panel"><div class="panel-head"><div><b>文件类型构成</b><small>按文件扩展名统计</small></div><button class="text-btn" data-goto="types">查看分析 →</button></div><div id="type-ranking" class="type-ranking"></div></div>
+          </div>
+        </div>
+        <div id="treemap-view" class="view hidden">
+          <div class="toolbar"><div class="breadcrumbs" id="breadcrumbs"></div><div class="toolbar-right"><button class="btn small ghost" id="zoom-out">−</button><span class="zoom-label" id="zoom-label">层级 2</span><button class="btn small ghost" id="zoom-in">＋</button><button class="btn small ghost" id="up-btn">↑ 上一级</button><button class="btn small ghost" id="map-reset">重置视图</button></div></div>
+          <div class="panel full-map-panel"><div class="panel-head"><div><b>空间地图</b><small>单击选中 · 双击进入 · 滚轮调整嵌套深度</small></div><div class="map-size" id="map-size"></div></div><canvas id="main-map" class="fluid-canvas" aria-label="流体式磁盘空间地图"></canvas><div class="map-inspector" id="map-inspector"><div class="inspector-icon">◈</div><div class="inspector-copy"><small>当前选中</small><b id="selected-name">尚未选择项目</b><span id="selected-path">单击地图中的区域查看详情，双击文件夹进入</span></div><div class="inspector-size"><small>占用空间</small><b id="selected-size">—</b></div></div></div>
+        </div>
+        <div id="files-view" class="view hidden">
+          <div class="toolbar"><div class="filter-wrap"><span>⌕</span><input id="file-search" placeholder="搜索文件名或路径…"></div><select id="file-sort"><option value="size">按大小从大到小</option><option value="name">按名称排序</option><option value="date">按修改时间排序</option><option value="type">按类型排序</option></select><select id="file-kind"><option value="all">全部项目</option><option value="file">仅文件</option><option value="dir">仅文件夹</option></select></div>
+          <div class="panel table-panel"><div class="table-head"><span>名称</span><span>类型</span><span>修改时间</span><span>大小</span></div><div id="file-rows"></div><div class="table-foot" id="file-count"></div></div>
+        </div>
+        <div id="types-view" class="view hidden">
+          <div class="section-heading"><div><div class="eyebrow">FILE COMPOSITION</div><h2>文件类型分析</h2><p class="subheading">了解空间被哪些格式占用。</p></div></div>
+          <div class="panel type-panel"><div id="type-bars"></div></div>
+        </div>
+        <div class="scan-progress hidden" id="progress"><div class="progress-head"><div><b id="progress-title">正在扫描…</b><small id="progress-detail">准备读取目录</small></div><div class="progress-actions"><button id="pause-btn" class="text-btn">暂停</button><button id="cancel-btn" class="text-btn">取消</button></div></div><div class="progress-track indeterminate"><div id="progress-fill"></div></div><div class="progress-stats"><span id="progress-files">0 个文件</span><span id="progress-folders">0 个文件夹</span><span id="progress-bytes">0 B</span><span id="progress-errors">0 个跳过</span></div></div>
+      </section>
+      <footer><span>SPACE ANALYZER</span><span>本地分析 · 数据不会上传</span></footer>
+    </main>
+    <div class="toast" id="toast"></div>
+    <input type="file" id="folder-input" webkitdirectory directory multiple hidden>
+  </div>
+  <script type="module" src="/src/app.js"></script>
+</body>
+</html>
